@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -12,16 +13,26 @@ func main() {
 		fmt.Println("Unable to open file - ", err)
 		return
 	}
+	curLine := ""
 	for {
 		data := make([]byte, 8)
 		_, err := file.Read(data)
 		if err != nil {
 			if err == io.EOF {
-				return
+				break
 			}
 			fmt.Println("Error reading contents of file ", err)
 			return
 		}
-		fmt.Printf("read: %s\n", data)
+		splits := strings.Split(string(data[:]), "\n")
+		curLine += splits[0]
+		if len(splits) > 1 {
+			fmt.Printf("read: %s\n", curLine)
+			curLine = ""
+			curLine += splits[1]
+		}
+	}
+	if len(curLine) > 0 {
+		fmt.Printf("read: %s", curLine)
 	}
 }
